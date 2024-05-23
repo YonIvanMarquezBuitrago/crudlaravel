@@ -74,6 +74,7 @@ class UsuarioController extends Controller
      */
     public function edit($id)
     {
+        //La función edit retorna los datos
         //echo $id;
         //En singular se hace la busqueda en el Modelo (consulta), con find($id) encuentra los id, pero si el id no existe arroja error, por ello se usa mejor findOrFail($id)
         $usuario=User::findOrFail($id);
@@ -86,6 +87,7 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //La función update ejecuta las modificaciones que se hagan
         //Validación backend: name de los input en el formulario
         $request->validate([
             'name' => 'required|max:100',
