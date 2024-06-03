@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
@@ -52,9 +53,8 @@ class UsuarioController extends Controller
         $usuario->password=Hash::make($request['password']);
         //Guardamos los datos en la tabla de la BD
         $usuario->save();
-        //Redireccionamos segun ruta definida en web.php
+        //Redireccionamos segun ruta definida en web.php. El Mensaje está definido en C:\wamp64\www\sisgestiondearchivos\resources\views\layouts\admin.blade.php
         return redirect()->route('usuarios.index')->with('titulo','Excelente!!')->with('mensaje','Se registró al Usuario Correctamente')->with('icono','success');
-
     }
 
     /**
@@ -87,7 +87,7 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //La función update ejecuta las modificaciones que se hagan
+        //La función update ejecuta las modificaciones que se hagan similar a create
         //Validación backend: name de los input en el formulario
         $request->validate([
             'name' => 'required|max:100',
@@ -96,6 +96,7 @@ class UsuarioController extends Controller
             //este campo debe ser requwerido y confirmado
             //'password' => 'required|confirmed',
         ]);
+        /*Se hace la consulta y se asigna a una variable*/
         $usuario=User::find($id);
         $usuario->name=$request->name;
         $usuario->email=$request->email;
@@ -114,5 +115,40 @@ class UsuarioController extends Controller
     {
         User::destroy($id);
         return redirect()->route('usuarios.index');
+    }
+
+    public function registro()
+    {
+        return view('auth.registro');
+    }
+
+    public function registro_create(Request $request)
+    {
+        //Función similar a store
+        //Recuperar todo lo que está dentro del formulario
+        // $datos=request()->all();
+        //return response()->json($datos);
+
+        //Validación backend: name de los input en el formulario
+        $request->validate([
+            'name' => 'required|max:100',
+            //este campo debe ser requerido y unico en la tabla users
+            'email' => 'required|unique:users',
+            //este campo debe ser requwerido y confirmado
+            'password' => 'required|confirmed',
+        ]);
+        //se declara la variable y se hace instanciación al Modelo
+        $usuario=new User();
+        $usuario->name=$request->name;
+        $usuario->email=$request->email;
+        //Definimos el tipo de encriptado para el password
+        $usuario->password=Hash::make($request['password']);
+        //Guardamos los datos en la tabla de la BD
+        $usuario->save();
+        //inicio de sesión de formas automática después del Registro
+        Auth::login($usuario);
+
+        //Redireccionamos segun ruta definida en web.php
+        return redirect('/')->with('titulo','Bienvenido!!')->with('mensaje','Te registraste Correctamente y ahora estás en el Sistema de Gestión de Archivos')->with('icono','success');
     }
 }
