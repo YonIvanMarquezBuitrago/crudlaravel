@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Carpeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class CarpetaController extends Controller
 {
@@ -14,11 +15,11 @@ class CarpetaController extends Controller
     public function index()
     {
         //Se autentica para que solo muestre las carpetas y archivos del usuario correspondiente
-        $id_user=Auth::user()->id;
+        $id_user = Auth::user()->id;
         /*Se condiciona la busqueda a aque solo traiga las carpetas padre*/
         /*$carpetas = Carpeta::all();*/
         $carpetas = Carpeta::whereNull('carpeta_padre_id')
-            ->where('user_id',$id_user)
+            ->where('user_id', $id_user)
             ->get();
         return view('admin.mi_unidad.index', ['carpetas' => $carpetas]);
     }
@@ -117,9 +118,16 @@ class CarpetaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        // echo $id;
+        Carpeta::destroy($id);
+//eliminar carpeta en PRIVADO
+        Storage::deleteDirectory($id);
+//eliminar carpeta en PÚBLICO
+        Storage::deleteDirectory('public/' . $id);
+        //Redireccionamos según ruta definida en web.php. El Mensaje está definido en C:\wamp64\www\sisgestiondearchivos\resources\views\layouts\admin.blade.php
+        return redirect()->back()->with('titulo', 'Muy Bien!!')->with('mensaje', 'Se Eliminó la Carpeta Correctamente')->with('icono', 'success');
     }
 
     public function crear_subcarpeta(Request $request)

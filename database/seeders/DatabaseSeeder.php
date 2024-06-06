@@ -21,23 +21,29 @@ class DatabaseSeeder extends Seeder
              'name' => 'Test User',
              'email' => 'test@example.com',
          ]);*/
+
+        /*LLamamos el Seeder de Roles*/
+        $this->call([RoleSeeder::class]);
+
         //Usuario Administrador
         User::create([
             'name' => 'admin',
             'email' => 'admin@admin.com',
             'password' => Hash::make('12345678'),
-        ]);
+        ])->assignRole('admin');
         //Usuario Funcionario
         User::create([
             'name' => 'funcionario',
             'email' => 'funcionario@admin.com',
             'password' => Hash::make('12345678'),
-        ]);
+        ])->assignRole('usuario');
         //Usuario Visualizador
         User::create([
             'name' => 'visor',
             'email' => 'visor@admin.com',
             'password' => Hash::make('12345678'),
-        ]);
+        ])->assignRole('usuario');
+
+
     }
 }

@@ -110,7 +110,37 @@
                                             </form>
                                         </div>
                                     </a>
-                                    <a class="dropdown-item" href="#"><i class="bi bi-trash"></i> Eliminar</a>
+                                    <form action="{{url('admin/mi_unidad/eliminar_carpeta',$carpeta->id)}}" onclick="preguntar_c{{$carpeta->id}}(event)" id="miFormularioB{{$carpeta->id}}" method="post">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="text" name="id" value="{{$carpeta->id}}" hidden>
+                                        <button type="submit" class="dropdown-item" href="#"><i class="bi bi-trash"></i> Eliminar</button>
+                                    </form>
+                                    <script>
+                                        function preguntar_c{{$carpeta->id}}(event) {
+                                            event.preventDefault();
+                                            Swal.fire({
+                                                title: "¿Desea Eliminar Carpeta?",
+                                                text: "Si elimina la carpeta, se eliminará su contenido de manera permanente",
+                                                icon: "question",
+                                                showDenyButton: true,
+                                                confirmButtonText: "Eliminar",
+                                                confirmButtonColor: "#a5161d",
+                                                denyButtonColor: "#270a0a",
+                                                denyButtonText: "Cancelar",
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    var form = $('#miFormularioB{{$carpeta->id}}');
+                                                    form.submit();
+                                                    Swal.fire({
+                                                        title: "Eliminado!",
+                                                        text: "Tus archivos han sido eliminados.",
+                                                        icon: "success"
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    </script>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +159,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{url('admin/mi_unidad')}}" method="post">
+                            <form action="{{url('admin/mi_unidad/update_padre')}}" method="post">
                                 @csrf
                                 @method('PUT')
                                 <input type="text" value="{{$carpeta->id}}" name="id" hidden>

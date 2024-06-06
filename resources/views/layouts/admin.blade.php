@@ -19,6 +19,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!--https://sweetalert2.github.io/#download-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Video.js JavaScript -->
+    <script src="https://vjs.zencdn.net/7.15.4/video.js"></script>
+
+    <!--clipboard.js-->
+    {{--<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>--}}
+    <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/v1.5.3/dist/clipboard.min.js"></script>
+
+    {{--Convertir el enlace del archivo en código QR--}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     {{--Estilo del botón de las carpetas--}}
     <style>
         .dropdown-toggle {
@@ -100,30 +111,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
 
-                    <!--USUARIOS-->
-                    <li class="nav-item">
-                        <a href="#" class="nav-link active">
-                            <i class="nav-icon fas bi bi-people-fill"></i>
-                            <p>
-                                Usuarios
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{url('admin/usuarios/create')}}" class="nav-link active">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Nuevo Usuario</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{url('admin/usuarios')}}" class="nav-link active">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Listado de Usuarios</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+
+                    @can('usuarios.index')
+                        <!--USUARIOS-->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas bi bi-people-fill"></i>
+                                <p>
+                                    Usuarios
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{url('admin/usuarios/create')}}" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Nuevo Usuario</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{url('admin/usuarios')}}" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Listado de Usuarios</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
 
                     <!--CARPETAS-->
                     <li class="nav-item">

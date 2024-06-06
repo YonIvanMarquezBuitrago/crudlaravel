@@ -53,6 +53,9 @@ class UsuarioController extends Controller
         $usuario->password=Hash::make($request['password']);
         //Guardamos los datos en la tabla de la BD
         $usuario->save();
+
+        //Asignación de Rol
+        $usuario->assignRole('usuario');
         //Redireccionamos segun ruta definida en web.php. El Mensaje está definido en C:\wamp64\www\sisgestiondearchivos\resources\views\layouts\admin.blade.php
         return redirect()->route('usuarios.index')->with('titulo','Excelente!!')->with('mensaje','Se registró al Usuario Correctamente')->with('icono','success');
     }

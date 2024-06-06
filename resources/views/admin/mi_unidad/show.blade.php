@@ -27,7 +27,7 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <form action="{{url('admin/mi_unidad/carpeta')}}" method="post" class="dropzone" id="myDropzone" enctype="multipart/form-data">
+                            <form action="{{url('admin/mi_unidad/carpeta/upload')}}" method="post" class="dropzone" id="myDropzone" enctype="multipart/form-data">
                                 @csrf
                                 <div class="modal-body">
                                     <input type="text" value="{{$carpeta->id}}" name="id" hidden>
@@ -64,7 +64,7 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <form action="{{url('admin/mi_unidad/carpeta')}}" method="get">
+                            <form action="{{url('admin/mi_unidad/carpeta/crear_subcarpeta')}}" method="post">
                                 @csrf
                                 <div class="modal-body">
                                     <div class="row">
@@ -82,14 +82,13 @@
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                                         <button type="submit" class="btn btn-primary">Crear</button>
                                     </div>
+                                </div>
                             </form>
                         </div>
                     </div>
                 </div>
+            </ol>
         </div>
-
-        </ol>
-    </div>
     </div>
     <hr>
     <h5>Carpetas y Archivos</h5>
@@ -173,7 +172,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{url('admin/mi_unidad/carpeta')}}" method="post">
+                            <form action="{{url('admin/mi_unidad/carpeta/update_subcarpeta')}}" method="post">
                                 @csrf
                                 @method('PUT')
                                 <input type="text" value="{{$subcarpeta->id}}" name="id" hidden>
@@ -365,7 +364,7 @@
                                     </button>
                                 </div>
                                 <div class="modal-body" style="text-align: center">
-                                    <iframe src="{{asset('storage/'.$carpeta->id.'/'.$archivo->nombre)}}"  alt=""></iframe>
+                                    <iframe src="{{asset('storage/'.$carpeta->id.'/'.$archivo->nombre)}}" alt=""></iframe>
                                     <hr>
                                     <a href="{{asset('storage/'.$carpeta->id.'/'.$archivo->nombre)}}" class="btn btn-success">Ver en Navegador</a>
                                 </div>
@@ -397,11 +396,111 @@
                     <?php } ?>
                 </td>
                 <td>{{$archivo->updated_at}}</td>
-                <td>Eliminar</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
 
+
+                        {{--Botón de Eliminar Archivos--}}
+                        <form action="{{url('admin/mi_unidad/carpeta')}}" method="post" onclick="preguntar{{$archivo->id}}(event)" id="miFormulario{{$archivo->id}}">
+                            @csrf
+                            @method('DELETE')
+                            <input type="text" value="{{$archivo->id}}" name="id" hidden>
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        </form>
+                        <script>
+                            function preguntar{{$archivo->id}}(event) {
+                                event.preventDefault();
+                                Swal.fire({
+                                    title: "Eliminar Registro",
+                                    text: "¿Desea eliminar este registro?",
+                                    icon: "question",
+                                    showDenyButton: true,
+                                    confirmButtonText: "Eliminar",
+                                    confirmButtonColor: "#a5161d",
+                                    denyButtonColor: "#270a0a",
+                                    denyButtonText: "Cancelar",
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        var form = $('#miFormulario{{$archivo->id}}');
+                                        form.submit();
+                                        Swal.fire({
+                                            title: "Eliminado!",
+                                            text: "Tus archivos han sido eliminados.",
+                                            icon: "success"
+                                        });
+                                    }
+                                });
+                            }
+                        </script>{{-- FinBotón de Eliminar Archivos--}}
+
+                        {{--Botón para Compartir Archivos--}}
+                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#modal_compartir_{{$archivo->id}}"><i class="bi bi-share-fill"></i></button>
+
+                        <!-- Modal para Compartir Archivos- -->
+                        <div class="modal fade" id="modal_compartir_{{$archivo->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog  modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Compartir Archivo</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>{{$archivo->nombre}}</p>
+                                            <?php if ($archivo->estado_archivo == "PRIVADO"){ ?>
+                                        <b>Este archivo tiene estado Privado</b><br>
+                                        <hr>
+                                        <form action="{{route('mi_unidad.archivo.cambiar.privado.publico')}}" method="get">
+                                            @csrf
+                                            <input type="text" name="id" value="{{$archivo->id}}" hidden>
+                                            <button type="submit" class="btn btn-success">Cambiar a Público</button>
+                                        </form>
+                                        <?php }else{ ?>
+                                        <b>Este archivo tiene estado Público</b><br>
+                                        <hr>
+                                        <form action="{{route('mi_unidad.archivo.cambiar.publico.privado')}}" method="post">
+                                            @csrf
+                                            <input type="text" name="id" value="{{$archivo->id}}" hidden>
+                                            <button type="submit" class="btn btn-primary">Cambiar a Privado</button>
+                                        </form>
+                                        <hr>
+                                        <button data-clipboard-target="#foo{{$archivo->id}}" type="button" class="btn btn-outline-primary">Copiar Enlace</button>
+                                        <input type="text" id="foo{{$archivo->id}}" value="{{asset('storage/'.$carpeta->id.'/'.$archivo->nombre)}}" class="form-control">
+                                        <script>var clipboard = new Clipboard('.btn');</script>
+                                        <br>
+
+                                        {{--Convertir el enlace del archivo en código QR--}}
+                                        <center><div id="qrcode{{$archivo->id}}"></div></center>
+                                        <script>
+                                            var opciones={
+                                                width:150, //Ancho del Código QR
+                                                height:150, //Alto del Código QR
+                                            };
+                                            //Texto o URL que se convertirá en código QR
+                                            var texto = "{{asset('storage/'.$carpeta->id.'/'.$archivo->nombre)}}";
+
+                                            //Genera el código QR con las opciones de configuración
+                                            var qrcode=new QRCode("qrcode{{$archivo->id}}",opciones);
+                                            qrcode.makeCode(texto); //Convertir el texto en código QR
+                                        </script>
+
+
+                                            <?php
+                                        } ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{--Fin Botón para Compartir Archivos--}}
+                    </div>
+                </td>
             </tr>
         @endforeach
         </tbody>
     </table>
 
+
+    {{-- <img src="{{route('mostrar.archivos.privados',['carpeta'=>$archivo->carpeta_id,'archivo'=>$archivo->nombre])}}" alt="archivo">
+     <a href="{{route('mostrar.archivos.privados',['carpeta'=>$archivo->carpeta_id,'archivo'=>$archivo->nombre])}}">Archivo</a>--}}
 @endsection
